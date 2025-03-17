@@ -27,11 +27,15 @@ def temporary_file(suffix):
         yield temp.name
     finally:
         time.sleep(3)  # Aguarda 3 segundos para garantir que os arquivos não estejam mais em uso
-        try:
-            os.remove(temp.name)
-        except PermissionError:
+        for _ in range(3):  # Tenta excluir o arquivo até 3 vezes
+            try:
+                os.remove(temp.name)
+                break  # Se a exclusão for bem-sucedida, sai do loop
+            except PermissionError:
+                time.sleep(1)  # Espera um pouco antes de tentar novamente
+        else:
             st.warning(f"⚠️ Não foi possível remover {temp.name}, pois ainda está em uso.")
-            logger.warning(f"Não foi possível remover {temp.name} devido a um erro de permissão.")
+            logger.warning(f"Não foi possível remover {temp.name} após várias tentativas devido a um erro de permissão.")
 
 # Função para extrair áudio de vídeo
 def extract_audio(input_path, audio_path):
@@ -40,13 +44,13 @@ def extract_audio(input_path, audio_path):
             if video.audio is None:
                 st.error("❌ O arquivo carregado não contém áudio. Por favor, carregue um arquivo válido.")
                 return False
-            
-            st.info("🎵 Extraindo áudio... (Etapa 1/3)")
+
+            st.info(" Extraindo áudio... (Etapa 1/3)")
             video.audio.write_audiofile(audio_path)
             st.success("✅ Extração de áudio concluída!")
-        
+
         return True
-    
+
     except Exception as e:
         logger.error(f"Erro ao extrair áudio: {e}", exc_info=True)
         st.error(f"❌ Erro ao extrair áudio: {e}")
@@ -98,7 +102,7 @@ def process_audio_or_video(input_path, audio_path, selected_language, max_length
     if input_path.endswith(".mp4"):
         extracted = extract_audio(input_path, audio_path)
         if not extracted:
-            st.error("🚫 Ocorreu um erro na extração do áudio.")
+            st.error(" Ocorreu um erro na extração do áudio.")
             raise Exception("Falha ao extrair áudio")
     else:
         # Se for MP3, apenas copiar para o áudio de trabalho
@@ -107,40 +111,40 @@ def process_audio_or_video(input_path, audio_path, selected_language, max_length
     progress_bar.progress(33)
 
     # Passo 2: Transcrição
-    st.info(f"📝 Transcrevendo áudio em {selected_language}... (Etapa 2/3)")
+    st.info(f" Transcrevendo áudio em {selected_language}... (Etapa 2/3)")
     transcript = whisper_model.transcribe(audio_path, language=language_options[selected_language])
     transcribed_text = transcript["text"]
-    
-    st.subheader("📜 Texto Transcrito:")
+
+    st.subheader(" Texto Transcrito:")
     st.text_area("Resultado:", transcribed_text, height=200)
     st.success("✅ Transcrição concluída!")
     progress_bar.progress(66)
 
     # Passo 3: Resumo
-    st.info("📑 Gerando resumo... (Etapa 3/3)")
+    st.info(" Gerando resumo... (Etapa 3/3)")
     summary = summarizer(transcribed_text, max_length=max_length, min_length=min_length, do_sample=False)
     summary_text = summary[0]['summary_text']
 
-    st.subheader("📌 Resumo:")
-    st.markdown(f"💡 **{summary_text}**")
+    st.subheader(" Resumo:")
+    st.markdown(f" **{summary_text}**")
     st.success("✅ Resumo gerado com sucesso!")
     progress_bar.progress(80)
 
     # Passo 4: Extração de Tópicos
-    st.info("📚 Extraindo tópicos principais... (Etapa 4/4)")
+    st.info(" Extraindo tópicos principais... (Etapa 4/4)")
     topics = topic_extractor.extract_keywords(transcribed_text, top_n=5)  # Extrai 5 tópicos principais
     topics_list = [topic[0] for topic in topics]  # Lista de tópicos
 
-    st.subheader("🎯 Tópicos Principais:")
+    st.subheader(" Tópicos Principais:")
     st.markdown("\n".join([f"- **{topic}**" for topic in topics_list]))
     st.success("✅ Extração de tópicos concluída!")
     progress_bar.progress(100)
 
 # Interface do aplicativo
-st.title("📹 IA para Transcrição, Resumo e Extração de Tópicos de Áudio/Vídeo")
+st.title(" IA para Transcrição, Resumo e Extração de Tópicos de Áudio/Vídeo")
 
 # Upload do arquivo
-uploaded_file = st.file_uploader("🎥 Carregue um arquivo de vídeo (MP4) ou áudio (MP3)", type=["mp4", "mp3"])
+uploaded_file = st.file_uploader(" Carregue um arquivo de vídeo (MP4) ou áudio (MP3)", type=["mp4", "mp3"])
 
 # Seleção de idioma
 language_options = {
@@ -151,7 +155,7 @@ language_options = {
     "Alemão": "de",
     "Italiano": "it",
 }
-selected_language = st.selectbox("🗣️ Selecione o idioma do áudio/vídeo:", list(language_options.keys()))
+selected_language = st.selectbox("️ Selecione o idioma do áudio/vídeo:", list(language_options.keys()))
 
 # Parâmetros configuráveis para sumarização
 st.subheader("⚙️ Configurações de Resumo")

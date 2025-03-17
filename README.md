@@ -1,4 +1,5 @@
-📹 IA para Transcrição, Resumo e Extração de Tópicos de Áudio/Vídeo
+📹 IA para Transcrição, Resumo e Extração de Tópicos de Áudio/Vídeo (Ainda em construção)
+
 Este aplicativo utiliza Inteligência Artificial para transcrever áudios/vídeos, gerar resumos do conteúdo transcrito e extrair os tópicos mais importantes discutidos no material. A interface é desenvolvida com Streamlit , e as funcionalidades são alimentadas por modelos avançados de IA como Whisper , BART e KeyBERT .
 
 🚀 Funcionalidades Principais
