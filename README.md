@@ -49,7 +49,7 @@ Este projeto é licenciado sob a licença MIT. Consulte o arquivo `LICENSE` para
 ## Autor ‍
 
 * [L21Oltramari](https://github.com/L21Oltramari)
-* Linkedin: https://www.linkedin.com/in/leonardo-oltramari-317761165/
+* [Linkedin] (https://www.linkedin.com/in/leonardo-oltramari-317761165/)
 
 ## Agradecimentos 
 
